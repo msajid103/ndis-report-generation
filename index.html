@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDIS Functional Capacity Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --dark: #38455a;
+            --border: #e2e8f0;
+            --success: #059669;
+            --danger: #dc2626;
+            --radius: 8px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .no-print {
+            margin-bottom: 30px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 20px;
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            background: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: var(--light);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .print-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .print-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .erase-btn {
+            border: 1px solid red;
+            color: red;
+        }
+
+        .erase-btn:hover {
+            border: 1px solid red;
+            background: red;
+            color: white;
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .auto-save-indicator {
+            padding: 12px 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+        }
+
+        .auto-save-indicator.saving {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .auto-save-indicator.saved {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+        }
+
+        .subsection {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+
+        .subsection.hidden-section {
+            background: #e0e0e0;
+            opacity: 0.5;
+        }
+
+        .subsection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .subsection-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+            flex-grow: 1;
+        }
+
+        .subsection-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dropdown-btn {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            padding: 5px;
+        }
+
+        .dropdown-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .subsection-content {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .subsection-content.expanded {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .icon-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .supervisor-comment {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff5f5;
+            border-left: 4px solid #f44336;
+            border-radius: 6px;
+        }
+
+        .supervisor-comment textarea {
+            color: #d32f2f;
+            font-style: italic;
+        }
+
+        .rating-scales {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .rating-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rating-item label {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .rating-item input {
+            padding: 8px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .recommendation-entry {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .recommendation-entry h4 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .funding-line {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .add-remove-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .small-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .small-btn:hover {
+            background: #5568d3;
+        }
+
+        .small-btn.delete {
+            background: #f44336;
+        }
+
+        .small-btn.delete:hover {
+            background: #d32f2f;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #667eea;
+            text-align: center;
+            color: #666;
+        }
+
+        .page-footer {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 20px;
+                box-shadow: none;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .subsection-controls {
+                display: none !important;
+            }
+
+            .checkbox-container {
+                display: none !important;
+            }
+
+            .supervisor-comment {
+                display: none !important;
+            }
+
+            .subsection.hidden-section {
+                display: none !important;
+            }
+
+            .dropdown-btn {
+                display: none !important;
+            }
+
+            .subsection-content {
+                display: block !important;
+            }
+
+            .subsection-header {
+                cursor: default;
+            }
+
+            .icon-btn {
+                display: none !important;
+            }
+
+            .page-footer {
+                display: block;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px 20px;
+                font-size: 10px;
+                border-top: 1px solid #ccc;
+                background: white;
+            }
+
+            @page {
+                margin: 20mm;
+
+                @bottom-center {
+                    content: counter(page);
+                }
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .rating-scales {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="no-print toolbar">
+            <button class="btn print-btn" title="Print / PDF" onclick="printToPDF()">
+                <i class="fas fa-print"></i>
+            </button>
+            <button class="btn erase-btn" title="Clear Form" onclick="clearAll()">
+                <i class="fas fa-eraser"></i>
+            </button>
+            <button class="btn" title="Save" onclick="saveData()">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="btn" title="Export" onclick="exportJSON()">
+                <i class="fas fa-file-export"></i>
+            </button>
+            <button class="btn" title="Import" onclick="document.getElementById('importFile').click()">
+                <i class="fas fa-file-import"></i>
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importJSON(event)">
+            <div class="auto-save-indicator" id="autoSaveIndicator">
+                <i class="fas fa-circle"></i>
+                <span id="autoSaveText">Auto-save enabled</span>
+            </div>
+        </div>
+
+        <h1>NDIS Functional Capacity Assessment</h1>
+
+        <!-- Section 1: Participant Information -->
+        <div class="section">
+            <h2 class="section-title">Participant Information</h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Client</h3>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Name</label>
+                        <input type="text" id="clientName" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>NDIS Number</label>
+                        <input type="text" id="ndisNumber" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="dob" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Address</label>
+                    <input type="text" id="address" onchange="autoSave()">
+                </div>
+                <div class="field-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" onchange="autoSave()">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Advocates</h3>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Contact Person Name</label>
+                        <input type="text" id="contactPerson" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Relationship</label>
+                        <input type="text" id="relationship" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Contact Details</label>
+                        <input type="text" id="contactDetails" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Support Coordinator</label>
+                        <input type="text" id="supportCoordinator" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Plan Manager</label>
+                    <input type="text" id="planManager" onchange="autoSave()">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">NDIS Information</h3>
+                <div class="field-group">
+                    <label>NDIS Goals</label>
+                    <textarea id="ndisGoals" onchange="autoSave()"></textarea>
+                </div>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Primary Disability</label>
+                        <input type="text" id="primaryDisability" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Secondary Disabilities</label>
+                        <input type="text" id="secondaryDisabilities" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Other Medical Concerns</label>
+                    <textarea id="medicalConcerns" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Current Plan Dates</label>
+                    <input type="text" id="planDates" onchange="autoSave()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Assessment Details -->
+        <div class="section">
+            <h2 class="section-title">Assessment Details</h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Reason for Assessment</h3>
+                <div class="field-group">
+                    <textarea id="reasonAssessment" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Assessment Methodology</h3>
+                <div class="field-group">
+                    <label>Direct Observation</label>
+                    <textarea id="directObservation" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Interviews Conducted</label>
+                    <textarea id="interviews" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Document Review</label>
+                    <textarea id="documentReview" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Context -->
+        <div class="section">
+            <h2 class="section-title">Context</h2>
+
+            <div class="subsection">
+                <div class="field-group">
+                    <label>Participant Background</label>
+                    <textarea id="participantBackground" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Weekly Routine</label>
+                    <textarea id="weeklyRoutine" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Physical Environment</label>
+                    <textarea id="physicalEnvironment" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Informal Supports</label>
+                    <textarea id="informalSupports" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Formal Supports</label>
+                    <textarea id="formalSupports" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Assessment -->
+        <div class="section">
+            <h2 class="section-title">Assessment</h2>
+            <div id="assessmentSubsections"></div>
+            <button class="btn no-print" onclick="addCustomSubsection()" style="margin-top: 20px; border-left: 4px solid var(--primary); background: #667eea; color: white;">
+                <i class="fas fa-plus"></i> Add Custom Section
+            </button>
+        </div>
+
+        <!-- Funding Summary -->
+        <div class="section">
+            <h2 class="section-title">Funding Summary</h2>
+            <div class="chart-container">
+                <canvas id="fimChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="copmChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section">
+            <h2 class="section-title">Recommendations</h2>
+            <div id="recommendationsSection"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <h2 class="section-title">Summary</h2>
+            <div class="subsection">
+                <div class="field-group">
+                    <label>Strengths</label>
+                    <textarea id="strengths" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Challenges</label>
+                    <textarea id="challenges" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign Off -->
+        <div class="section">
+            <h2 class="section-title">Sign Off</h2>
+            <div id="signOffSection"></div>
+            <div class="add-remove-btns no-print">
+                <button class="small-btn" onclick="addSignOffLine()">
+                    <i class="fas fa-plus"></i> Add Therapist
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Rivergum Allied Therapies</strong></p>
+            <p>If you have any questions about this report, please contact us.</p>
+        </div>
+
+        <div class="page-footer">
+            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span> | Page <span
+                class="page-number"></span>
+        </div>
+    </div>
+
+    <script>
+        const assessmentAreas = [
+            'Physical skills',
+            'Psychosocial status',
+            'Cognitive function',
+            'Intellectual function',
+            'Behaviour',
+            'Sensory preferences',
+            'Communication',
+            'Walking and moving',
+            'Indoor mobility',
+            'Outdoor mobility',
+            'Stairs/steps',
+            'Transport',
+            'Chair transfers and seating needs',
+            'Bed transfers and mobility',
+            'Toilet transfers and toileting',
+            'Bathing transfers, bathing and grooming',
+            'Dressing',
+            'Nutrition, feeding and swallowing',
+            'Sleeping and night needs',
+            'Managing medical and basic needs',
+            'Cooking and preparing food',
+            'Shopping',
+            'Cleaning and maintaining the home',
+            'Paying bills and life administration',
+            'Social relationships',
+            'Vocational roles',
+            'Hobbies and community integration'
+        ];
+
+        let customSubsectionCounter = 0;
+        let autoSaveTimeout;
+
+        // Initialize assessment subsections
+        function initializeAssessmentSubsections() {
+            const container = document.getElementById('assessmentSubsections');
+            assessmentAreas.forEach((area, index) => {
+                container.appendChild(createAssessmentSubsection(area, `area${index}`));
+            });
+        }
+
+        function createAssessmentSubsection(title, id) {
+            const subsection = document.createElement('div');
+            subsection.className = 'subsection';
+            subsection.id = id;
+            subsection.innerHTML = `
+                <div class="subsection-header" onclick="toggleSubsection('${id}')">
+                    <h3 class="subsection-title">${title}</h3>
+                        
+                        <div class="subsection-controls no-print" onclick="event.stopPropagation()">
+                            <button class="dropdown-btn icon-btn" onclick="toggleSubsection('${id}')" id="${id}_dropdown">
+                            <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <button class="icon-btn" onclick="toggleHideSection('${id}')" title="Hide in Print">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                            <button class="icon-btn" onclick="toggleSupervisorComment('${id}')" title="Supervisor comment">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            ${id.startsWith('custom') ? `<button class="icon-btn" onclick="deleteCustomSection('${id}')" title="Delete section"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                </div>
+                <div class="subsection-content" id="${id}_content">
+                    <div class="field-group">
+                        <textarea id="${id}_comment" onchange="autoSave()" placeholder="Enter assessment notes..."></textarea>
+                    </div>
+                    <div class="rating-scales">
+                        <div class="rating-item">
+                            <label>FIM Scale (1-7)</label>
+                            <input type="number" id="${id}_fim" min="1" max="7" onchange="autoSave(); updateCharts()">
+                        </div>
+                        <div class="rating-item">
+                            <label>COPM Performance</label>
+                            <input type="number" id="${id}_copm_perf" min="1" max="10" onchange="autoSave(); updateCharts()">
+                        </div>
+                        <div class="rating-item">
+                            <label>COPM Satisfaction</label>
+                            <input type="number" id="${id}_copm_sat" min="1" max="10" onchange="autoSave(); updateCharts()">
+                        </div>
+                    </div>
+                    <div class="supervisor-comment" id="${id}_supervisor" style="display: none;">
+                        <label>Supervisor Comment</label>
+                        <textarea id="${id}_supervisor_text" onchange="autoSave()" placeholder="Enter supervisor comments..."></textarea>
+                    </div>
+                    <div class="checkbox-container no-print">
+                        <input type="checkbox" id="${id}_recommend" onchange="toggleRecommendation('${id}', '${title}')">
+                        <label for="${id}_recommend">Add to recommendations</label>
+                    </div>
+                </div>
+            `;
+                return subsection;
+        }
+        function toggleSubsection(id) {
+            const content = document.getElementById(`${id}_content`);
+            const dropdown = document.getElementById(`${id}_dropdown`);
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                dropdown.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                dropdown.classList.add('expanded');
+            }
+        }
+        function addCustomSubsection() {
+            const title = prompt('Enter custom section title:');
+            if (title) {
+                const id = `custom${customSubsectionCounter++}`;
+                const container = document.getElementById('assessmentSubsections');
+                container.appendChild(createAssessmentSubsection(title, id));
+                autoSave();
+            }
+        }
+
+        function deleteCustomSection(id) {
+            if (confirm('Delete this section?')) {
+                document.getElementById(id).remove();
+                autoSave();
+            }
+        }
+
+        function toggleHideSection(id) {
+            const section = document.getElementById(id);
+            section.classList.toggle('hidden-section');
+            autoSave();
+        }
+
+        function toggleSupervisorComment(id) {
+            const comment = document.getElementById(`${id}_supervisor`);
+            comment.style.display = comment.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleRecommendation(id, title) {
+            const checkbox = document.getElementById(`${id}_recommend`);
+            const recSection = document.getElementById('recommendationsSection');
+
+            if (checkbox.checked) {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'recommendation-entry';
+                recDiv.id = `rec_${id}`;
+                recDiv.innerHTML = `
+                    <h4>${title}</h4>
+                    <div class="field-group">
+                        <label>Goal</label>
+                        <textarea id="${id}_rec_goal" onchange="autoSave()"></textarea>
+                    </div>
+                    <div class="two-column">
+                        <div class="field-group">
+                            <label>Effective and Beneficial</label>
+                            <textarea id="${id}_rec_effective" onchange="autoSave()"></textarea>
+                        </div>
+                        <div class="field-group">
+                            <label>Related to Disability</label>
+                            <textarea id="${id}_rec_disability" onchange="autoSave()"></textarea>
+                        </div>
+                        <div class="field-group">
+                            <label>Related to Goals</label>
+                            <textarea id="${id}_rec_goals" onchange="autoSave()"></textarea>
+                        </div>
+                        <div class="field-group">
+                            <label>Value for Money</label>
+                            <textarea id="${id}_rec_value" onchange="autoSave()"></textarea>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label><strong>Funding</strong></label>
+                        <div id="${id}_funding_lines"></div>
+                        <div class="add-remove-btns no-print">
+                            <button class="small-btn" onclick="addFundingLine('${id}')">
+                                <i class="fas fa-plus"></i> Add Funding Line
+                            </button>
+                        </div>
+                    </div>
+                `;
+                recSection.appendChild(recDiv);
+            } else {
+                const recDiv = document.getElementById(`rec_${id}`);
+                if (recDiv) recDiv.remove();
+            }
+            autoSave();
+        }
+
+        function addFundingLine(id) {
+            const container = document.getElementById(`${id}_funding_lines`);
+            const lineId = `${id}_funding_${Date.now()}`;
+            const line = document.createElement('div');
+            line.className = 'funding-line';
+            line.id = lineId;
+            line.innerHTML = `
+                <input type="text" placeholder="Funding Area" onchange="autoSave()">
+                <input type="text" placeholder="Funding Type" onchange="autoSave()">
+                <input type="text" placeholder="Hours/Budget" onchange="autoSave()">
+                <div>
+                <button class="small-btn delete no-print" onclick="document.getElementById('${lineId}').remove(); autoSave()">
+                    <i class="fas fa-trash"></i>
+                </button>
+                </div>
+            `;
+            container.appendChild(line);
+            autoSave();
+        }
+
+        function addSignOffLine() {
+            const container = document.getElementById('signOffSection');
+            const lineId = `signoff_${Date.now()}`;
+            const line = document.createElement('div');
+            line.className = 'subsection';
+            line.id = lineId;
+            line.innerHTML = `
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Name</label>
+                        <input type="text" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>AHPRA/SPA Number</label>
+                        <input type="text" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Profession</label>
+                        <input type="text" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Date</label>
+                        <input type="date" onchange="autoSave()">
+                    </div>
+                </div>
+                <button class="small-btn delete no-print" onclick="document.getElementById('${lineId}').remove(); autoSave()">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            `;
+            container.appendChild(line);
+            autoSave();
+        }
+
+        let fimChart, copmChart;
+
+        function updateCharts() {
+            const labels = [];
+            const fimData = [];
+            const copmPerfData = [];
+            const copmSatData = [];
+
+            assessmentAreas.forEach((area, index) => {
+                const id = `area${index}`;
+                const fim = document.getElementById(`${id}_fim`)?.value;
+                const perf = document.getElementById(`${id}_copm_perf`)?.value;
+                const sat = document.getElementById(`${id}_copm_sat`)?.value;
+
+                if (fim || perf || sat) {
+                    labels.push(area.substring(0, 20));
+                    fimData.push(parseFloat(fim) || 0);
+                    copmPerfData.push(parseFloat(perf) || 0);
+                    copmSatData.push(parseFloat(sat) || 0);
+                }
+            });
+
+            if (fimChart) fimChart.destroy();
+            if (copmChart) copmChart.destroy();
+
+            const fimCtx = document.getElementById('fimChart').getContext('2d');
+            fimChart = new Chart(fimCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'FIM Scale (1-7)',
+                        data: fimData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 7
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'FIM Scale Scores',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+
+            const copmCtx = document.getElementById('copmChart').getContext('2d');
+            copmChart = new Chart(copmCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'COPM Performance',
+                            data: copmPerfData,
+                            backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'COPM Satisfaction',
+                            data: copmSatData,
+                            backgroundColor: 'rgba(255, 152, 0, 0.7)',
+                            borderColor: 'rgba(255, 152, 0, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'COPM Scores',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function autoSave() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            const text = document.getElementById('autoSaveText');
+
+            indicator.className = 'auto-save-indicator saving';
+            text.textContent = 'Saving...';
+
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                const data = collectAllData();
+                localStorage.setItem('ndis_fca_data', JSON.stringify(data));
+
+                indicator.className = 'auto-save-indicator saved';
+                text.textContent = 'Saved';
+
+                setTimeout(() => {
+                    indicator.className = 'auto-save-indicator';
+                    text.textContent = 'Auto-save enabled';
+                }, 2000);
+            }, 1000);
+        }
+
+        function collectAllData() {
+            const data = {
+                clientInfo: {},
+                advocates: {},
+                ndisInfo: {},
+                assessmentDetails: {},
+                context: {},
+                assessmentAreas: [],
+                customSections: [],
+                summary: {},
+                signOff: [],
+                recommendations: []
+            };
+
+            // Collect all input fields
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.id && el.value) {
+                    data.clientInfo[el.id] = el.value;
+                }
+            });
+
+            // Collect assessment areas with ratings
+            assessmentAreas.forEach((area, index) => {
+                const id = `area${index}`;
+                const areaData = {
+                    id: id,
+                    title: area,
+                    comment: document.getElementById(`${id}_comment`)?.value || '',
+                    fim: document.getElementById(`${id}_fim`)?.value || '',
+                    copmPerf: document.getElementById(`${id}_copm_perf`)?.value || '',
+                    copmSat: document.getElementById(`${id}_copm_sat`)?.value || '',
+                    supervisorComment: document.getElementById(`${id}_supervisor_text`)?.value || '',
+                    hidden: document.getElementById(id)?.classList.contains('hidden-section'),
+                    hasRecommendation: document.getElementById(`${id}_recommend`)?.checked || false
+                };
+
+                if (areaData.hasRecommendation) {
+                    areaData.recommendation = {
+                        goal: document.getElementById(`${id}_rec_goal`)?.value || '',
+                        effective: document.getElementById(`${id}_rec_effective`)?.value || '',
+                        disability: document.getElementById(`${id}_rec_disability`)?.value || '',
+                        goals: document.getElementById(`${id}_rec_goals`)?.value || '',
+                        value: document.getElementById(`${id}_rec_value`)?.value || ''
+                    };
+                }
+
+                data.assessmentAreas.push(areaData);
+            });
+
+            // Collect custom sections
+            document.querySelectorAll('[id^="custom"]').forEach(section => {
+                const id = section.id;
+                if (section.classList.contains('subsection')) {
+                    const title = section.querySelector('.subsection-title')?.textContent;
+                    data.customSections.push({
+                        id: id,
+                        title: title,
+                        comment: document.getElementById(`${id}_comment`)?.value || '',
+                        fim: document.getElementById(`${id}_fim`)?.value || '',
+                        copmPerf: document.getElementById(`${id}_copm_perf`)?.value || '',
+                        copmSat: document.getElementById(`${id}_copm_sat`)?.value || ''
+                    });
+                }
+            });
+
+            return data;
+        }
+
+        function saveData() {
+            const data = collectAllData();
+            localStorage.setItem('ndis_fca_data', JSON.stringify(data));
+            alert('Data saved successfully!');
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('ndis_fca_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+
+                    // Restore all input fields
+                    Object.keys(data.clientInfo).forEach(key => {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data.clientInfo[key];
+                    });
+
+                    // Restore assessment areas
+                    if (data.assessmentAreas) {
+                        data.assessmentAreas.forEach(area => {
+                            const commentEl = document.getElementById(`${area.id}_comment`);
+                            const fimEl = document.getElementById(`${area.id}_fim`);
+                            const perfEl = document.getElementById(`${area.id}_copm_perf`);
+                            const satEl = document.getElementById(`${area.id}_copm_sat`);
+                            const supervisorEl = document.getElementById(`${area.id}_supervisor_text`);
+                            const recCheckbox = document.getElementById(`${area.id}_recommend`);
+
+                            if (commentEl) commentEl.value = area.comment;
+                            if (fimEl) fimEl.value = area.fim;
+                            if (perfEl) perfEl.value = area.copmPerf;
+                            if (satEl) satEl.value = area.copmSat;
+                            if (supervisorEl) supervisorEl.value = area.supervisorComment;
+
+                            if (area.hidden) {
+                                document.getElementById(area.id)?.classList.add('hidden-section');
+                            }
+
+                            if (area.hasRecommendation && recCheckbox) {
+                                recCheckbox.checked = true;
+                                toggleRecommendation(area.id, area.title);
+
+                                if (area.recommendation) {
+                                    setTimeout(() => {
+                                        document.getElementById(`${area.id}_rec_goal`).value = area.recommendation.goal;
+                                        document.getElementById(`${area.id}_rec_effective`).value = area.recommendation.effective;
+                                        document.getElementById(`${area.id}_rec_disability`).value = area.recommendation.disability;
+                                        document.getElementById(`${area.id}_rec_goals`).value = area.recommendation.goals;
+                                        document.getElementById(`${area.id}_rec_value`).value = area.recommendation.value;
+                                    }, 100);
+                                }
+                            }
+                        });
+                    }
+
+                    updateCharts();
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.removeItem('ndis_fca_data');
+                location.reload();
+            }
+        }
+
+        function exportJSON() {
+            const data = collectAllData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NDIS_FCA_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        localStorage.setItem('ndis_fca_data', JSON.stringify(data));
+                        alert('Data imported successfully! Reloading page...');
+                        location.reload();
+                    } catch (error) {
+                        alert('Error importing file. Please make sure it is a valid JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function printToPDF() {
+            // Update footer with client name
+            const clientName = document.getElementById('clientName').value || 'N/A';
+            document.getElementById('footerClientName').textContent = clientName;
+
+            window.print();
+        }
+
+        // Update footer client name on change
+        document.addEventListener('DOMContentLoaded', function () {
+            const clientNameInput = document.getElementById('clientName');
+            if (clientNameInput) {
+                clientNameInput.addEventListener('input', function () {
+                    document.getElementById('footerClientName').textContent = this.value || 'N/A';
+                });
+            }
+        });
+
+        // Initialize
+        initializeAssessmentSubsections();
+        addSignOffLine();
+        loadData();
+        updateCharts();
+    </script>
+</body>
+
+</html>
