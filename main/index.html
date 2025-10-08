@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDIS Functional Capacity Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="no-print toolbar">
+            <button class="btn print-btn" title="Print / PDF" onclick="printToPDF()">
+                <i class="fas fa-print"></i>Print / PDF
+            </button>
+            <button class="btn erase-btn" title="Clear Form" onclick="clearAll()">
+                <i class="fas fa-eraser"></i>Clear Form
+            </button>
+            <button class="btn" title="Save" onclick="saveData()">
+                <i class="fas fa-save"></i>Save
+            </button>
+            <button class="btn" title="Export" onclick="exportJSON()">
+                <i class="fas fa-file-export"></i>Export
+            </button>
+            <button class="btn" title="Import" onclick="document.getElementById('importFile').click()">
+                <i class="fas fa-file-import"></i>Import
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importJSON(event)">
+            <div class="auto-save-indicator" id="autoSaveIndicator">
+                <i class="fas fa-circle"></i>
+                <span id="autoSaveText">Auto-save enabled</span>
+            </div>
+        </div>
+
+        <h1>NDIS Functional Capacity Assessment</h1>
+
+        <!-- Section 1: Participant Information -->
+        <div class="section">
+            <h2 class="section-title">Participant Information</h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Client</h3>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Name</label>
+                        <input type="text" id="clientName" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>NDIS Number</label>
+                        <input type="text" id="ndisNumber" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="dob" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Address</label>
+                    <input type="text" id="address" onchange="autoSave()">
+                </div>
+                <div class="field-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" onchange="autoSave()">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Advocates</h3>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Contact Person Name</label>
+                        <input type="text" id="contactPerson" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Relationship</label>
+                        <input type="text" id="relationship" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Contact Details</label>
+                        <input type="text" id="contactDetails" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Support Coordinator</label>
+                        <input type="text" id="supportCoordinator" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Plan Manager</label>
+                    <input type="text" id="planManager" onchange="autoSave()">
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">NDIS Information</h3>
+                <div class="field-group">
+                    <label>NDIS Goals</label>
+                    <textarea id="ndisGoals" onchange="autoSave()"></textarea>
+                </div>
+                <div class="two-column">
+                    <div class="field-group">
+                        <label>Primary Disability</label>
+                        <input type="text" id="primaryDisability" onchange="autoSave()">
+                    </div>
+                    <div class="field-group">
+                        <label>Secondary Disabilities</label>
+                        <input type="text" id="secondaryDisabilities" onchange="autoSave()">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Other Medical Concerns</label>
+                    <textarea id="medicalConcerns" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Current Plan Dates</label>
+                    <input type="text" id="planDates" onchange="autoSave()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Assessment Details -->
+        <div class="section">
+            <h2 class="section-title">Assessment Details</h2>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Reason for Assessment</h3>
+                <div class="field-group">
+                    <textarea id="reasonAssessment" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Assessment Methodology</h3>
+                <div class="field-group">
+                    <label>Direct Observation</label>
+                    <textarea id="directObservation" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Interviews Conducted</label>
+                    <textarea id="interviews" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Document Review</label>
+                    <textarea id="documentReview" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Context -->
+        <div class="section">
+            <h2 class="section-title">Context</h2>
+
+            <div class="subsection">
+                <div class="field-group">
+                    <label>Participant Background</label>
+                    <textarea id="participantBackground" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Weekly Routine</label>
+                    <textarea id="weeklyRoutine" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Physical Environment</label>
+                    <textarea id="physicalEnvironment" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Informal Supports</label>
+                    <textarea id="informalSupports" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Formal Supports</label>
+                    <textarea id="formalSupports" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Assessment -->
+        <div class="section">
+            <h2 class="section-title">Assessment</h2>
+            <div id="assessmentSubsections"></div>
+            <button class="btn no-print" onclick="addCustomSubsection()"
+                style="margin-top: 20px; border-left: 4px solid var(--primary); background: #667eea; color: white;">
+                <i class="fas fa-plus"></i> Add Custom Section
+            </button>
+        </div>
+
+        <!-- Funding Summary -->
+        <div class="section">
+            <h2 class="section-title">Funding Summary</h2>
+            <div class="table-container">
+                <table id="fundingSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>Assessment Area</th>
+                            <th>FIM Scale (1-7)</th>
+                            <th>COPM Performance (1-10)</th>
+                            <th>COPM Satisfaction (1-10)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fundingTableBody">
+                        <!-- Table rows will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section">
+            <h2 class="section-title">Recommendations</h2>
+            <div id="recommendationsSection"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <h2 class="section-title">Summary</h2>
+            <div class="subsection">
+                <div class="field-group">
+                    <label>Strengths</label>
+                    <textarea id="strengths" onchange="autoSave()"></textarea>
+                </div>
+                <div class="field-group">
+                    <label>Challenges</label>
+                    <textarea id="challenges" onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign Off -->
+        <div class="section">
+            <h2 class="section-title">Sign Off</h2>
+            <div id="signOffSection"></div>
+            <div class="add-remove-btns no-print">
+                <button class="small-btn" onclick="addSignOffLine()">
+                    <i class="fas fa-plus"></i> Add Therapist
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Rivergum Allied Therapies</strong></p>
+            <p>If you have any questions about this report, please contact us.</p>
+        </div>
+
+        <div class="page-footer">
+            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span> | Page <span
+                class="page-number"></span>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
