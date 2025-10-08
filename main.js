@@ -1,4 +1,8 @@
 
+
+//      https://docs.google.com/document/d/1CclOjgrcw98yKWgQmloS1lpDkeCHcWoW0M8bErwKTxo/edit?usp=sharing
+
+
 const assessmentAreas = [
     'Physical skills',
     'Psychosocial status',
@@ -45,13 +49,10 @@ function createAssessmentSubsection(title, id) {
     subsection.className = 'subsection';
     subsection.id = id;
     subsection.innerHTML = `
-                <div class="subsection-header" onclick="toggleSubsection('${id}')">
+                <div class="subsection-header">
                     <h3 class="subsection-title">${title}</h3>
                         
-                        <div class="subsection-controls no-print" onclick="event.stopPropagation()">
-                            <button class="dropdown-btn icon-btn" onclick="toggleSubsection('${id}')" id="${id}_dropdown">
-                            <i class="fas fa-chevron-down"></i>
-                            </button>
+                        <div class="subsection-controls no-print">
                             <button class="icon-btn" onclick="toggleHideSection('${id}')" title="Hide in Print">
                                 <i class="fas fa-eye-slash"></i>
                             </button>
@@ -61,22 +62,22 @@ function createAssessmentSubsection(title, id) {
                             ${id.startsWith('custom') ? `<button class="icon-btn" onclick="deleteCustomSection('${id}')" title="Delete section"><i class="fas fa-trash"></i></button>` : ''}
                         </div>
                 </div>
-                <div class="subsection-content" id="${id}_content">
+                <div class="subsection-content">
                     <div class="field-group">
                         <textarea id="${id}_comment" onchange="autoSave()" placeholder="Enter assessment notes..."></textarea>
                     </div>
                     <div class="rating-scales">
                         <div class="rating-item">
                             <label>FIM Scale (1-7)</label>
-                            <input type="number" id="${id}_fim" min="1" max="7" onchange="autoSave(); updateCharts()">
+                            <input type="number" id="${id}_fim" min="1" max="7" onchange="autoSave(); updateFundingTable()">
                         </div>
                         <div class="rating-item">
                             <label>COPM Performance</label>
-                            <input type="number" id="${id}_copm_perf" min="1" max="10" onchange="autoSave(); updateCharts()">
+                            <input type="number" id="${id}_copm_perf" min="1" max="10" onchange="autoSave(); updateFundingTable()">
                         </div>
                         <div class="rating-item">
                             <label>COPM Satisfaction</label>
-                            <input type="number" id="${id}_copm_sat" min="1" max="10" onchange="autoSave(); updateCharts()">
+                            <input type="number" id="${id}_copm_sat" min="1" max="10" onchange="autoSave(); updateFundingTable()">
                         </div>
                     </div>
                     <div class="supervisor-comment" id="${id}_supervisor" style="display: none;">
@@ -91,18 +92,18 @@ function createAssessmentSubsection(title, id) {
             `;
     return subsection;
 }
-function toggleSubsection(id) {
-    const content = document.getElementById(`${id}_content`);
-    const dropdown = document.getElementById(`${id}_dropdown`);
+// function toggleSubsection(id) {
+//     const content = document.getElementById(`${id}_content`);
+//     const dropdown = document.getElementById(`${id}_dropdown`);
 
-    if (content.classList.contains('expanded')) {
-        content.classList.remove('expanded');
-        dropdown.classList.remove('expanded');
-    } else {
-        content.classList.add('expanded');
-        dropdown.classList.add('expanded');
-    }
-}
+//     if (content.classList.contains('expanded')) {
+//         content.classList.remove('expanded');
+//         dropdown.classList.remove('expanded');
+//     } else {
+//         content.classList.add('expanded');
+//         dropdown.classList.add('expanded');
+//     }
+// }
 function addCustomSubsection() {
     const title = prompt('Enter custom section title:');
     if (title) {
