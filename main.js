@@ -92,6 +92,9 @@ function createAssessmentSubsection(title, id) {
                         <button class="icon-btn" onclick="toggleHideSection('${id}')" title="Hide in Print">
                             <i class="fas fa-eye-slash"></i>
                         </button>
+                         <button class="icon-btn" onclick="toggleSupervisorComment('${id}')" title="Supervisor comment">
+                                <i class="fas fa-comment"></i>
+                            </button>
                         <button class="icon-btn" onclick="toggleGuidance('${id}')" title="Show Guidance">
                             <i class="fas fa-lightbulb"></i>
                         </button>
@@ -396,6 +399,7 @@ function updateCoverPage() {
     }
 }
 
+
 function autoSave() {
     const indicator = document.getElementById('autoSaveIndicator');
     const text = document.getElementById('autoSaveText');
@@ -406,78 +410,81 @@ function autoSave() {
     clearTimeout(autoSaveTimeout);
     autoSaveTimeout = setTimeout(() => {
         const data = collectAllData();
-        try {
-            // Using in-memory storage simulation since localStorage not available
-            window.formData = data;
+        localStorage.setItem('ndis_fca_data', JSON.stringify(data));
 
-            indicator.className = 'auto-save-indicator saved';
-            text.textContent = 'Saved';
+        indicator.className = 'auto-save-indicator saved';
+        text.textContent = 'Saved';
 
-            setTimeout(() => {
-                indicator.className = 'auto-save-indicator';
-                text.textContent = 'Auto-save enabled';
-            }, 2000);
-        } catch (e) {
-            console.error('Save error:', e);
-        }
+        setTimeout(() => {
+            indicator.className = 'auto-save-indicator';
+            text.textContent = 'Auto-save enabled';
+        }, 2000);
     }, 1000);
 }
+
+
 
 function collectAllData() {
     const data = {
         clientInfo: {},
-        advocates: [],
+        advocates: {},
+        ndisInfo: {},
+        assessmentDetails: {},
+        context: {},
         assessmentAreas: [],
         customSections: [],
-        recommendations: [],
+        summary: {},
         signOff: [],
-        standardisedAssessment: {
-            enabled: document.getElementById('standardisedAssessmentToggle')?.checked || false,
-            text: document.getElementById('standardisedAssessmentText')?.value || ''
-        }
+        recommendations: []
     };
 
+    // Collect all input fields
     document.querySelectorAll('input, textarea, select').forEach(el => {
-        if (el.id && el.value && !el.id.includes('_')) {
+        if (el.id && el.value) {
             data.clientInfo[el.id] = el.value;
         }
     });
 
-    document.querySelectorAll('#advocatesContainer .dynamic-line').forEach(line => {
-        const inputs = line.querySelectorAll('input');
-        if (inputs.length >= 2) {
-            data.advocates.push({
-                name: inputs[0].value,
-                relationship: inputs[1].value
-            });
-        }
-    });
-
+    // Collect assessment areas with ratings
     assessmentAreas.forEach((area, index) => {
         const id = `area${index}`;
-        const titleElement = document.getElementById(`${id}_title`);
-        data.assessmentAreas.push({
+        const areaData = {
             id: id,
-            title: titleElement?.textContent || area,
+            title: area,
             comment: document.getElementById(`${id}_comment`)?.value || '',
             fim: document.getElementById(`${id}_fim`)?.value || '',
             copmPerf: document.getElementById(`${id}_copm_perf`)?.value || '',
             copmSat: document.getElementById(`${id}_copm_sat`)?.value || '',
             supervisorComment: document.getElementById(`${id}_supervisor_text`)?.value || '',
-            guidanceText: document.getElementById(`${id}_guidance_text`)?.value || '',
             hidden: document.getElementById(id)?.classList.contains('hidden-section'),
             hasRecommendation: document.getElementById(`${id}_recommend`)?.checked || false
-        });
+        };
+
+        if (areaData.hasRecommendation) {
+            areaData.recommendation = {
+                goal: document.getElementById(`${id}_rec_goal`)?.value || '',
+                effective: document.getElementById(`${id}_rec_effective`)?.value || '',
+                disability: document.getElementById(`${id}_rec_disability`)?.value || '',
+                goals: document.getElementById(`${id}_rec_goals`)?.value || '',
+                value: document.getElementById(`${id}_rec_value`)?.value || ''
+            };
+        }
+
+        data.assessmentAreas.push(areaData);
     });
 
-    document.querySelectorAll('#signOffSection .subsection').forEach(line => {
-        const inputs = line.querySelectorAll('input');
-        if (inputs.length >= 4) {
-            data.signOff.push({
-                name: inputs[0].value,
-                ahpra: inputs[1].value,
-                profession: inputs[2].value,
-                date: inputs[3].value
+    // Collect custom sections
+    document.querySelectorAll('[id^="custom"]').forEach(section => {
+        const id = section.id;
+        if (section.classList.contains('subsection')) {
+            const title = section.querySelector('.subsection-title')?.textContent;
+            data.customSections.push({
+                id: id,
+                title: title,
+                comment: document.getElementById(`${id}_comment`)?.value || '',
+                fim: document.getElementById(`${id}_fim`)?.value || '',
+                copmPerf: document.getElementById(`${id}_copm_perf`)?.value || '',
+                copmSat: document.getElementById(`${id}_copm_sat`)?.value || ''
             });
         }
     });
@@ -485,72 +492,73 @@ function collectAllData() {
     return data;
 }
 
+
+
+function loadData() {
+    const saved = localStorage.getItem('ndis_fca_data');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+
+            // Restore all input fields
+            Object.keys(data.clientInfo).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = data.clientInfo[key];
+            });
+
+            // Restore assessment areas
+            if (data.assessmentAreas) {
+                data.assessmentAreas.forEach(area => {
+                    const commentEl = document.getElementById(`${area.id}_comment`);
+                    const fimEl = document.getElementById(`${area.id}_fim`);
+                    const perfEl = document.getElementById(`${area.id}_copm_perf`);
+                    const satEl = document.getElementById(`${area.id}_copm_sat`);
+                    const supervisorEl = document.getElementById(`${area.id}_supervisor_text`);
+                    const recCheckbox = document.getElementById(`${area.id}_recommend`);
+
+                    if (commentEl) commentEl.value = area.comment;
+                    if (fimEl) fimEl.value = area.fim;
+                    if (perfEl) perfEl.value = area.copmPerf;
+                    if (satEl) satEl.value = area.copmSat;
+                    if (supervisorEl) supervisorEl.value = area.supervisorComment;
+
+                    if (area.hidden) {
+                        document.getElementById(area.id)?.classList.add('hidden-section');
+                    }
+
+                    if (area.hasRecommendation && recCheckbox) {
+                        recCheckbox.checked = true;
+                        toggleRecommendation(area.id, area.title);
+
+                        if (area.recommendation) {
+                            setTimeout(() => {
+                                document.getElementById(`${area.id}_rec_goal`).value = area.recommendation.goal;
+                                document.getElementById(`${area.id}_rec_effective`).value = area.recommendation.effective;
+                                document.getElementById(`${area.id}_rec_disability`).value = area.recommendation.disability;
+                                document.getElementById(`${area.id}_rec_goals`).value = area.recommendation.goals;
+                                document.getElementById(`${area.id}_rec_value`).value = area.recommendation.value;
+                            }, 100);
+                        }
+                    }
+                });
+            }
+
+            updateCharts();
+        } catch (e) {
+            console.error('Error loading data:', e);
+        }
+    }
+}
+
+
+
 function saveData() {
     const data = collectAllData();
     window.formData = data;
     alert('Data saved successfully!');
 }
 
-function loadData() {
-    if (window.formData) {
-        const data = window.formData;
 
-        Object.keys(data.clientInfo).forEach(key => {
-            const el = document.getElementById(key);
-            if (el) el.value = data.clientInfo[key];
-        });
-
-        if (data.advocates) {
-            data.advocates.forEach(advocate => {
-                addAdvocateLine();
-                const lines = document.querySelectorAll('#advocatesContainer .dynamic-line');
-                const lastLine = lines[lines.length - 1];
-                const inputs = lastLine.querySelectorAll('input');
-                inputs[0].value = advocate.name;
-                inputs[1].value = advocate.relationship;
-            });
-        }
-
-        if (data.assessmentAreas) {
-            data.assessmentAreas.forEach(area => {
-                const titleElement = document.getElementById(`${area.id}_title`);
-                if (titleElement && area.title) {
-                    titleElement.textContent = area.title;
-                }
-
-                const commentEl = document.getElementById(`${area.id}_comment`);
-                const fimEl = document.getElementById(`${area.id}_fim`);
-                const perfEl = document.getElementById(`${area.id}_copm_perf`);
-                const satEl = document.getElementById(`${area.id}_copm_sat`);
-
-                if (commentEl) commentEl.value = area.comment;
-                if (fimEl) fimEl.value = area.fim;
-                if (perfEl) perfEl.value = area.copmPerf;
-                if (satEl) satEl.value = area.copmSat;
-
-                if (area.hidden) {
-                    document.getElementById(area.id)?.classList.add('hidden-section');
-                }
-            });
-        }
-
-        if (data.standardisedAssessment) {
-            const toggle = document.getElementById('standardisedAssessmentToggle');
-            if (toggle) {
-                toggle.checked = data.standardisedAssessment.enabled;
-                toggleStandardisedAssessment();
-            }
-            const textEl = document.getElementById('standardisedAssessmentText');
-            if (textEl) textEl.value = data.standardisedAssessment.text;
-        }
-
-        setTimeout(() => {
-            initTextareas();
-            updateFundingTable();
-            updateCoverPage();
-        }, 100);
-    }
-}
 
 function clearAll() {
     if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
