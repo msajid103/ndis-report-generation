@@ -11,7 +11,102 @@
 </head>
 
 <body>
-    <div class="container">
+     <div class="container">
+        <!-- Cover Page -->
+        <div class="cover-page" id="coverPage">
+            <h1>NDIS Functional Capacity Assessment</h1>
+            <div class="client-info">
+                <strong>Client:</strong> <span id="coverClientName">_________________</span>
+            </div>
+            <div class="corporate-details">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Rivergum Allied Therapies</h2>
+                <p>ABN: [Insert ABN]</p>
+                <p>Address: [Insert Address]</p>
+                <p>Phone: [Insert Phone]</p>
+                <p>Email: [Insert Email]</p>
+            </div>
+            <div class="date-info">
+                <strong>Report Date:</strong> <span id="coverReportDate">_________________</span>
+            </div>
+        </div>
+
+        <!-- Contents Page -->
+        <div class="contents-page">
+            <h2>Table of Contents</h2>
+            <ul class="contents-list">
+                <li><span>Glossary</span><span>Page 3</span></li>
+                <li><span>Participant Information</span><span>Page 4</span></li>
+                <li><span>Assessment Details</span><span>Page 5</span></li>
+                <li><span>Context</span><span>Page 6</span></li>
+                <li><span>Assessment</span><span>Page 7</span></li>
+                <li><span>Funding Summary</span><span>Page 8</span></li>
+                <li><span>Standardised Assessment</span><span>Page 9</span></li>
+                <li><span>Recommendations</span><span>Page 10</span></li>
+                <li><span>Summary</span><span>Page 11</span></li>
+                <li><span>Sign Off</span><span>Page 12</span></li>
+            </ul>
+        </div>
+
+        <!-- Glossary Page -->
+        <div class="glossary-page">
+            <h2>Glossary of Assessment Tools</h2>
+            
+            <div class="glossary-item">
+                <h3>FIM (Functional Independence Measure)</h3>
+                <p>The FIM is a standardized tool used to assess the level of assistance required by a person to perform basic life activities. Scores range from 1 to 7, with higher scores indicating greater independence.</p>
+                
+                <div class="glossary-scale">
+                    <h4>FIM Scoring Guide:</h4>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">7</span>
+                        <span>Complete Independence - Person performs task safely, with no modifications, assistive devices, or aids, and within reasonable time</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">6</span>
+                        <span>Modified Independence - Person requires assistive device, more than reasonable time, or safety considerations</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">5</span>
+                        <span>Supervision/Setup - Person requires supervision, cueing, or setup</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">4</span>
+                        <span>Minimal Assistance - Person performs 75% or more of task</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">3</span>
+                        <span>Moderate Assistance - Person performs 50-74% of task</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">2</span>
+                        <span>Maximal Assistance - Person performs 25-49% of task</span>
+                    </div>
+                    <div class="glossary-scale-item">
+                        <span class="scale-number">1</span>
+                        <span>Total Assistance - Person performs less than 25% of task or task cannot be performed safely</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glossary-item">
+                <h3>COPM (Canadian Occupational Performance Measure)</h3>
+                <p>The COPM is a client-centered assessment tool designed to measure a person's self-perception of their performance and satisfaction with daily activities. Scores range from 1 to 10.</p>
+                
+                <div class="glossary-scale">
+                    <h4>COPM Performance Scale (1-10):</h4>
+                    <p><strong>1</strong> = Not able to perform the activity at all<br>
+                    <strong>10</strong> = Able to perform the activity extremely well</p>
+                </div>
+
+                <div class="glossary-scale">
+                    <h4>COPM Satisfaction Scale (1-10):</h4>
+                    <p><strong>1</strong> = Not satisfied at all with performance<br>
+                    <strong>10</strong> = Extremely satisfied with performance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
         <div class="no-print toolbar">
             <button class="btn print-btn" title="Print / PDF" onclick="printToPDF()">
                 <i class="fas fa-print"></i>Print / PDF
@@ -46,7 +141,7 @@
                 <div class="two-column">
                     <div class="field-group">
                         <label>Name</label>
-                        <input type="text" id="clientName" onchange="autoSave()">
+                        <input type="text" id="clientName" onchange="autoSave(); updateCoverPage()">
                     </div>
                     <div class="field-group">
                         <label>NDIS Number</label>
@@ -73,27 +168,21 @@
 
             <div class="subsection">
                 <h3 class="subsection-title">Advocates</h3>
-                <div class="two-column">
-                    <div class="field-group">
-                        <label>Contact Person Name</label>
-                        <input type="text" id="contactPerson" onchange="autoSave()">
-                    </div>
-                    <div class="field-group">
-                        <label>Relationship</label>
-                        <input type="text" id="relationship" onchange="autoSave()">
-                    </div>
-                    <div class="field-group">
-                        <label>Contact Details</label>
-                        <input type="text" id="contactDetails" onchange="autoSave()">
-                    </div>
+                <div id="advocatesContainer"></div>
+                <div class="add-remove-btns no-print">
+                    <button class="small-btn" onclick="addAdvocateLine()">
+                        <i class="fas fa-plus"></i> Add Advocate
+                    </button>
+                </div>
+                <div class="two-column" style="margin-top: 20px;">
                     <div class="field-group">
                         <label>Support Coordinator</label>
                         <input type="text" id="supportCoordinator" onchange="autoSave()">
                     </div>
-                </div>
-                <div class="field-group">
-                    <label>Plan Manager</label>
-                    <input type="text" id="planManager" onchange="autoSave()">
+                    <div class="field-group">
+                        <label>Plan Manager</label>
+                        <input type="text" id="planManager" onchange="autoSave()">
+                    </div>
                 </div>
             </div>
 
@@ -203,10 +292,24 @@
                             <th>COPM Satisfaction (1-10)</th>
                         </tr>
                     </thead>
-                    <tbody id="fundingTableBody">
-                        <!-- Table rows will be populated dynamically -->
-                    </tbody>
+                    <tbody id="fundingTableBody"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Standardised Assessment Section -->
+        <div class="section">
+            <h2 class="section-title">Standardised Assessment</h2>
+            <div class="checkbox-container no-print">
+                <input type="checkbox" id="standardisedAssessmentToggle" onchange="toggleStandardisedAssessment()">
+                <label for="standardisedAssessmentToggle">Include Standardised Assessment section</label>
+            </div>
+            <div id="standardisedAssessmentSection" style="display: none;">
+                <div class="subsection">
+                    <div class="field-group">
+                        <textarea id="standardisedAssessmentText" onchange="autoSave()" placeholder="Enter standardised assessment details..."></textarea>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -249,11 +352,9 @@
         </div>
 
         <div class="page-footer">
-            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span> | Page <span
-                class="page-number"></span>
+            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span> | Page <span class="page-number"></span>
         </div>
     </div>
-
     <script src="main.js"></script>
 </body>
 

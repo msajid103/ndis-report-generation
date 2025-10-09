@@ -22,13 +22,113 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
     min-height: 100vh;
     padding: 20px;
 }
 
-/* ------------Global---------------- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
 
+/* Cover Page */
+.cover-page {
+    page-break-after: always;
+    text-align: center;
+    padding: 100px 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover-page h1 {
+    font-size: 3em;
+    color: #667eea;
+    margin-bottom: 40px;
+}
+
+.cover-page .client-info {
+    font-size: 1.5em;
+    margin: 20px 0;
+    color: #555;
+}
+
+.cover-page .corporate-details {
+    margin-top: 60px;
+    font-size: 1.1em;
+}
+
+.cover-page .date-info {
+    margin-top: 40px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+/* Contents & Glossary */
+.contents-page,
+.glossary-page {
+    page-break-after: always;
+    padding: 40px;
+}
+
+.contents-page h2,
+.glossary-page h2 {
+    color: #667eea;
+    margin-bottom: 30px;
+    font-size: 2em;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.contents-list {
+    list-style: none;
+    padding: 0;
+}
+
+.contents-list li {
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.glossary-item {
+    margin-bottom: 30px;
+}
+
+.glossary-item h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.glossary-scale {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.glossary-scale-item {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.glossary-scale-item:last-child {
+    border-bottom: none;
+}
+
+.scale-number {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 50px;
+}
 
 h1 {
     text-align: center;
@@ -57,27 +157,16 @@ textarea {
     border-radius: 6px;
     font-size: 14px;
     transition: border-color 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    resize: none;
+    overflow: hidden;
+    min-height: 45px;
 }
 
 input:focus,
 textarea:focus {
     outline: none;
     border-color: #667eea;
-}
-
-textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-/* ------------Global Edned here---------------- */
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    padding: 40px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
 }
 
 .no-print {
@@ -89,7 +178,6 @@ textarea {
     gap: 15px;
     flex-wrap: wrap;
     padding: 20px;
-    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
     border-radius: 8px;
     margin-bottom: 30px;
 }
@@ -107,7 +195,6 @@ textarea {
     color: var(--dark);
     border: 1px solid var(--border);
     background: white;
-    backdrop-filter: blur(10px);
 }
 
 .btn:hover {
@@ -131,13 +218,8 @@ textarea {
 }
 
 .erase-btn:hover {
-    border: 1px solid red;
     background: red;
     color: white;
-}
-
-.btn i {
-    font-size: 16px;
 }
 
 .auto-save-indicator {
@@ -147,19 +229,20 @@ textarea {
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: #555;
     font-size: 14px;
+    border: 1px solid #e0e0e0;
 }
 
 .auto-save-indicator.saving {
     background: rgba(255, 193, 7, 0.3);
+    border-color: #ffc107;
 }
 
 .auto-save-indicator.saved {
     background: rgba(76, 175, 80, 0.3);
+    border-color: #4caf50;
 }
-
-/* ----------Assessments------------- */
 
 .section {
     margin-bottom: 40px;
@@ -202,6 +285,19 @@ textarea {
     color: #333;
     font-weight: 600;
     flex-grow: 1;
+    border: 2px solid transparent;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.subsection-title.editable {
+    cursor: text;
+}
+
+.subsection-title.editing {
+    border-color: #667eea;
+    background: white;
 }
 
 .subsection-controls {
@@ -229,23 +325,46 @@ textarea {
     transform: scale(1.1);
 }
 
-.icon-btn.active {
-    background: #667eea;
-    color: white;
-}
-
 .field-group {
     margin-bottom: 20px;
 }
-
-/* ----------Assessments Sections Ended here------------- */
-
-
 
 .two-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+}
+
+.dynamic-lines-container {
+    margin-top: 15px;
+}
+
+.dynamic-line {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    align-items: end;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
 }
 
 .supervisor-comment {
@@ -256,8 +375,16 @@ textarea {
     border-radius: 6px;
 }
 
-.supervisor-comment textarea {
-    color: #d32f2f;
+.guidance-field {
+    margin-top: 15px;
+    padding: 15px;
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    border-radius: 6px;
+}
+
+.guidance-field textarea {
+    color: #1976d2;
     font-style: italic;
 }
 
@@ -285,22 +412,6 @@ textarea {
     padding: 8px;
 }
 
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-    padding: 12px;
-    background: white;
-    border-radius: 6px;
-}
-
-.checkbox-container input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
 .recommendation-entry {
     margin-bottom: 25px;
     padding: 20px;
@@ -312,16 +423,28 @@ textarea {
 .recommendation-entry h4 {
     color: #2e7d32;
     margin-bottom: 15px;
+    font-size: 1.4em;
+    border: 2px solid transparent;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: text;
+    transition: all 0.3s ease;
+}
+
+.recommendation-entry h4.editing {
+    border-color: #4caf50;
+    background: white;
 }
 
 .funding-line {
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr;
+    grid-template-columns: 2fr 2fr 1fr auto;
     gap: 10px;
     margin-top: 10px;
     padding: 10px;
     background: white;
     border-radius: 4px;
+    align-items: end;
 }
 
 .add-remove-btns {
@@ -355,7 +478,6 @@ textarea {
     background: #d32f2f;
 }
 
-/* -- Funding Summary -- */
 .table-container {
     overflow-x: auto;
     margin: 20px 0;
@@ -365,7 +487,7 @@ textarea {
     width: 100%;
     border-collapse: collapse;
     background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #fundingSummaryTable thead {
@@ -390,10 +512,6 @@ textarea {
     background: #f8f9fa;
 }
 
-#fundingSummaryTable tbody tr:last-child td {
-    border-bottom: none;
-}
-
 .score-cell {
     font-weight: 600;
     color: #667eea;
@@ -405,9 +523,6 @@ textarea {
     font-style: italic;
     text-align: center;
 }
-
-/* -- Funding Summary  End here -- */
-
 
 .footer {
     margin-top: 50px;
@@ -449,24 +564,27 @@ textarea {
         display: none !important;
     }
 
+    .guidance-field {
+        display: none !important;
+    }
+
     .subsection.hidden-section {
         display: none !important;
     }
 
-    /* .dropdown-btn {
-        display: none !important;
-    } */
-
-    .subsection-content {
-        display: block !important;
-    }
-
-    .subsection-header {
+    .subsection-title.editable {
         cursor: default;
     }
 
-    .icon-btn {
-        display: none !important;
+    input,
+    textarea {
+        border: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    textarea {
+        resize: none !important;
     }
 
     .page-footer {
@@ -481,12 +599,12 @@ textarea {
         background: white;
     }
 
+    .page-number::after {
+        content: counter(page);
+    }
+
     @page {
         margin: 20mm;
-
-        @bottom-center {
-            content: counter(page);
-        }
     }
 }
 
