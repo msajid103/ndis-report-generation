@@ -88,18 +88,18 @@ function createAssessmentSubsection(title, id) {
     subsection.innerHTML = `
                 <div class="subsection-header">
                     <h3 class="subsection-title" id="${id}_title">${title}</h3>
-                    <div class="subsection-controls no-print">
-                        <button class="icon-btn" onclick="toggleSubsection('${id}')" title="Show Guidance">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
+                    <div class="subsection-controls no-print">                      
+                         <button class="icon-btn toggle-btn" style="display:none" onclick="toggleSupervisorComment('${id}')" title="Supervisor comment">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        <button class="icon-btn toggle-btn"  style="display:none" onclick="toggleGuidance('${id}')" title="Show Guidance">
+                            <i class="fas fa-lightbulb"></i>
+                        </button>                          
                         <button class="icon-btn" onclick="toggleHideSection('${id}')" title="Hide in Print">
                             <i class="fas fa-eye-slash"></i>
                         </button>
-                         <button class="icon-btn" onclick="toggleSupervisorComment('${id}')" title="Supervisor comment">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                        <button class="icon-btn"  onclick="toggleGuidance('${id}')" title="Show Guidance">
-                            <i class="fas fa-lightbulb"></i>
+                        <button class="icon-btn" onclick="toggleSubsection('${id}')" title="Show Guidance">
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         ${id.startsWith('custom') ? `<button class="icon-btn" onclick="deleteCustomSection('${id}')" title="Delete section"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
@@ -149,10 +149,11 @@ function createAssessmentSubsection(title, id) {
 }
 function toggleSubsection(id) {
     const subsection = document.getElementById(id);
-
+    const hideBtns = document.querySelectorAll(`#${id} .toggle-btn`);
     const subsectionControls = document.querySelector(` #${id} .subsection-controls`);
     const subsectionContent = document.querySelector(`#${id} .subsection-content`);
     const isVisible = subsectionContent.style.display === 'none';
+    hideBtns.forEach(btn => btn.style.display = isVisible ? 'inline-block' : 'none');
     if (isVisible) {
         subsection.classList.remove('no-print'); // show in print when visible
     } else {
