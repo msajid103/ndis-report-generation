@@ -11,7 +11,7 @@
 </head>
 
 <body>
-     <div class="container">
+    <div class="container">
         <!-- Cover Page -->
         <div class="cover-page" id="coverPage">
             <h1>NDIS Functional Capacity Assessment</h1>
@@ -20,10 +20,8 @@
             </div>
             <div class="corporate-details">
                 <h2 style="color: #667eea; margin-bottom: 20px;">Rivergum Allied Therapies</h2>
-                <p>ABN: [Insert ABN]</p>
-                <p>Address: [Insert Address]</p>
-                <p>Phone: [Insert Phone]</p>
-                <p>Email: [Insert Email]</p>
+                <p>Phone: (03) 4310 2686</p>
+                <p>Email: info@rivergumalliedtherapies.com.au</p>
             </div>
             <div class="date-info">
                 <strong>Report Date:</strong> <span id="coverReportDate">_________________</span>
@@ -50,61 +48,45 @@
         <!-- Glossary Page -->
         <div class="glossary-page">
             <h2>Glossary of Assessment Tools</h2>
-            
+
             <div class="glossary-item">
                 <h3>FIM (Functional Independence Measure)</h3>
-                <p>The FIM is a standardized tool used to assess the level of assistance required by a person to perform basic life activities. Scores range from 1 to 7, with higher scores indicating greater independence.</p>
-                
+                <p>
+                    The FIM is a standardised tool for assessing how much help a person needs
+                    to complete basic daily tasks. Scores range from 1 to 7, with higher scores showing greater
+                    independence.
+                </p>
+
                 <div class="glossary-scale">
-                    <h4>FIM Scoring Guide:</h4>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">7</span>
-                        <span>Complete Independence - Person performs task safely, with no modifications, assistive devices, or aids, and within reasonable time</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">6</span>
-                        <span>Modified Independence - Person requires assistive device, more than reasonable time, or safety considerations</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">5</span>
-                        <span>Supervision/Setup - Person requires supervision, cueing, or setup</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">4</span>
-                        <span>Minimal Assistance - Person performs 75% or more of task</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">3</span>
-                        <span>Moderate Assistance - Person performs 50-74% of task</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">2</span>
-                        <span>Maximal Assistance - Person performs 25-49% of task</span>
-                    </div>
-                    <div class="glossary-scale-item">
-                        <span class="scale-number">1</span>
-                        <span>Total Assistance - Person performs less than 25% of task or task cannot be performed safely</span>
-                    </div>
+                    <h4>FIM Scoring:</h4>
+                    <ul>
+                        <li><strong>7</strong> – Complete Independence</li>
+                        <li><strong>6</strong> – Modified Independence (needs device or extra time)</li>
+                        <li><strong>5</strong> – Supervision or Setup</li>
+                        <li><strong>4</strong> – Minimal Assistance (does ≥75%)</li>
+                        <li><strong>3</strong> – Moderate Assistance (does 50–74%)</li>
+                        <li><strong>2</strong> – Maximal Assistance (does 25–49%)</li>
+                        <li><strong>1</strong> – Total Assistance (does <25%) </li>
+                    </ul>
                 </div>
             </div>
 
             <div class="glossary-item">
                 <h3>COPM (Canadian Occupational Performance Measure)</h3>
-                <p>The COPM is a client-centered assessment tool designed to measure a person's self-perception of their performance and satisfaction with daily activities. Scores range from 1 to 10.</p>
-                
-                <div class="glossary-scale">
-                    <h4>COPM Performance Scale (1-10):</h4>
-                    <p><strong>1</strong> = Not able to perform the activity at all<br>
-                    <strong>10</strong> = Able to perform the activity extremely well</p>
-                </div>
+                <p>
+                    The COPM measures how people rate their ability and satisfaction in daily activities.
+                    Scores range from 1 to 10.
+                </p>
 
                 <div class="glossary-scale">
-                    <h4>COPM Satisfaction Scale (1-10):</h4>
-                    <p><strong>1</strong> = Not satisfied at all with performance<br>
-                    <strong>10</strong> = Extremely satisfied with performance</p>
+                    <h4>Scales:</h4>
+                    <p><strong>Performance:</strong> 1 = Not able, 10 = Performs extremely well<br>
+                        <strong>Satisfaction:</strong> 1 = Not satisfied, 10 = Extremely satisfied
+                    </p>
                 </div>
             </div>
         </div>
+
 
         <!-- Toolbar -->
         <div class="no-print toolbar">
@@ -130,7 +112,7 @@
             </div>
         </div>
 
-        <h1>NDIS Functional Capacity Assessment</h1>
+        <h1 class="no-print">NDIS Functional Capacity Assessment</h1>
 
         <!-- Section 1: Participant Information -->
         <div class="section">
@@ -298,7 +280,7 @@
         </div>
 
         <!-- Standardised Assessment Section -->
-        <div class="section">
+        <div class="section no-print">
             <h2 class="section-title">Standardised Assessment</h2>
             <div class="checkbox-container no-print">
                 <input type="checkbox" id="standardisedAssessmentToggle" onchange="toggleStandardisedAssessment()">
@@ -307,7 +289,8 @@
             <div id="standardisedAssessmentSection" style="display: none;">
                 <div class="subsection">
                     <div class="field-group">
-                        <textarea id="standardisedAssessmentText" onchange="autoSave()" placeholder="Enter standardised assessment details..."></textarea>
+                        <textarea id="standardisedAssessmentText" onchange="autoSave()"
+                            placeholder="Enter standardised assessment details..."></textarea>
                     </div>
                 </div>
             </div>
@@ -349,10 +332,13 @@
         <div class="footer">
             <p><strong>Rivergum Allied Therapies</strong></p>
             <p>If you have any questions about this report, please contact us.</p>
+            <p>Phone: (03) 4310 2686</p>
+            <p>Email: info@rivergumalliedtherapies.com.au</p>
         </div>
 
         <div class="page-footer">
-            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span> | Page <span class="page-number"></span>
+            Rivergum Allied Therapies – FCA | Client: <span id="footerClientName"></span><span
+                class="page-number"></span>
         </div>
     </div>
     <script src="main.js"></script>

@@ -83,25 +83,28 @@ function initializeAssessmentSubsections() {
 
 function createAssessmentSubsection(title, id) {
     const subsection = document.createElement('div');
-    subsection.className = 'subsection';
+    subsection.className = 'subsection no-print';
     subsection.id = id;
     subsection.innerHTML = `
                 <div class="subsection-header">
                     <h3 class="subsection-title" id="${id}_title">${title}</h3>
                     <div class="subsection-controls no-print">
+                        <button class="icon-btn" onclick="toggleSubsection('${id}')" title="Show Guidance">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
                         <button class="icon-btn" onclick="toggleHideSection('${id}')" title="Hide in Print">
                             <i class="fas fa-eye-slash"></i>
                         </button>
                          <button class="icon-btn" onclick="toggleSupervisorComment('${id}')" title="Supervisor comment">
                                 <i class="fas fa-comment"></i>
                             </button>
-                        <button class="icon-btn" onclick="toggleGuidance('${id}')" title="Show Guidance">
+                        <button class="icon-btn"  onclick="toggleGuidance('${id}')" title="Show Guidance">
                             <i class="fas fa-lightbulb"></i>
                         </button>
                         ${id.startsWith('custom') ? `<button class="icon-btn" onclick="deleteCustomSection('${id}')" title="Delete section"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
                 </div>
-                <div class="subsection-content">
+                <div class="subsection-content" style="display: none;">
                     <div class="guidance-field" id="${id}_guidance" style="display: none;">
                         <label><i class="fas fa-lightbulb"></i> Guidance</label>
                         <textarea id="${id}_guidance_text" onchange="autoSave()" placeholder="Enter guidance text to help complete this section...">Complete guidance text will be added here. This field helps assessors understand what information should be included in this section.</textarea>
@@ -144,7 +147,34 @@ function createAssessmentSubsection(title, id) {
 
     return subsection;
 }
+function toggleSubsection(id) {
+    const subsection = document.getElementById(id);
 
+    const subsectionControls = document.querySelector(` #${id} .subsection-controls`);
+    const subsectionContent = document.querySelector(`#${id} .subsection-content`);
+    const isVisible = subsectionContent.style.display === 'none';
+    if (isVisible) {
+        subsection.classList.remove('no-print'); // show in print when visible
+    } else {
+        subsection.classList.add('no-print'); // hide in print when collapsed
+    }
+
+    subsectionContent.style.display = isVisible ? 'block' : 'none';
+    const toggleBtn = subsectionControls.querySelector('.fa-chevron-down');
+    toggleBtn.style.transform = isVisible ? 'rotate(180deg)' : 'rotate(0deg)';
+
+
+
+
+
+
+
+
+    setTimeout(initTextareas, 100);
+    autoSave();
+
+
+}
 function addCustomSubsection() {
     const title = prompt('Enter custom section title:');
     if (title) {
@@ -315,7 +345,19 @@ function addSignOffLine() {
 function toggleStandardisedAssessment() {
     const checkbox = document.getElementById('standardisedAssessmentToggle');
     const section = document.getElementById('standardisedAssessmentSection');
+    const parent = checkbox.closest('.section');
+    // Show or hide the section
     section.style.display = checkbox.checked ? 'block' : 'none';
+
+    // Add/remove the "no-print" class from parent
+    if (parent) {
+        if (checkbox.checked) {
+            parent.classList.remove('no-print');
+        } else {
+            parent.classList.add('no-print');
+        }
+    }
+
     setTimeout(initTextareas, 100);
     autoSave();
 }
@@ -388,17 +430,26 @@ function updateCoverPage() {
         if (input.value) dates.push(new Date(input.value));
     });
 
+    let reportDate;
     if (dates.length > 0) {
         const latestDate = new Date(Math.max(...dates));
-        const formattedDate = latestDate.toLocaleDateString('en-AU', {
+        reportDate = latestDate.toLocaleDateString('en-AU', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-        document.getElementById('coverReportDate').textContent = formattedDate;
+    } else {
+        // Use current date if no sign-off dates exist
+        const currentDate = new Date();
+        reportDate = currentDate.toLocaleDateString('en-AU', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     }
-}
 
+    document.getElementById('coverReportDate').textContent = reportDate;
+}
 
 function autoSave() {
     const indicator = document.getElementById('autoSaveIndicator');
